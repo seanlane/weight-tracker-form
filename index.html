@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- styles -->
+<?!= HtmlService.createHtmlOutputFromFile("styles.css").getContent(); ?>
+<div class="content">
+  <h1>Chart</h1>
+  <div class="row">
+    <div class="col">  
+      <label for="order_input">Regression Order</label>
+      <input id="order_input" type="number" min="1">
+    </div>
+    <div class="col">
+      <label for="wa_input">Weighted Average Horizon</label>
+      <input id="wa_input" type="number" min="3">
+    </div>
+    <div class="col">
+      <!-- Replace this URL with a link to the form you'll use -->
+      <a href="https://docs.google.com/forms/XXXXXXXXXXXXX">
+        Form Link
+      </a>
+    </div>
+  </div>
+  <div class="chart">
+    <canvas id="chartCanvas"></canvas>
+  </div>
+</div>
+
+<!-- javascript -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/regression/1.4.0/regression.min.js"></script>
+<?!= HtmlService.createHtmlOutputFromFile("chart.js").getContent() ?>
+<?!= HtmlService.createHtmlOutputFromFile("main.js").getContent() ?>

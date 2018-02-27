@@ -1,0 +1,113 @@
+<!-- This is the chart javascript -->
+
+<script>
+var globalData = null;
+var po_val = 3;
+var wa_val = 25;
+var globalChart = null;
+
+function doWMA( array, weightedPeriod ) { 
+    var period = weightedPeriod - 1;
+    var weightedArray = [];
+    for( var i = 0; i < array.length; i++ ) {
+        var sum = 0;
+        var count = 0;
+        for( var j = Math.max(0, i - Math.floor(period/2)); j < Math.min(array.length, i + Math.ceil(period/2)); j++ ) {
+            sum += array[j];
+            count++;
+        }
+        weightedArray[i] = sum / count;
+    }
+    return weightedArray;
+}
+
+// Initial function to draw chart on page load
+var initChart = function (input) {
+    globalData = input;
+    drawChart(input, po_val, wa_val, false);
+};
+
+function updateChart() {
+    var weights = globalData.map(function(val) { return val.weight; });
+    var weighted_avg = doWMA(weights, wa_val);
+    var reg_in = globalData.map(function(val) { return [moment(val.timestamp).unix(), val.weight];});
+    var reg_result = regression('polynomial', reg_in, parseInt(po_val));
+    console.log(reg_result);
+    var regs = reg_result.points;
+    globalChart.data.datasets[1].data = weighted_avg;
+    globalChart.data.datasets[2].data = regs.map(function(val) { return val[1]; });
+    globalChart.update();
+}
+
+// Draw the chart
+function drawChart (input, poly_order, wa_horizon) {
+    var ctx = document.getElementById('chartCanvas').getContext('2d');
+    var weights = input.map(function(val) { return val.weight; });
+    var weighted_avg = doWMA(weights, wa_horizon);
+    var reg_in = input.map(function(val) { return [moment(val.timestamp).unix(), val.weight];});
+    var regs = regression('polynomial', reg_in, parseInt(poly_order)).points;
+    var data = {
+        // Labels should be Date objects
+        labels: input.map(function(val) {
+            return val.timestamp;
+        }),
+        datasets: [{
+            fill: false,
+            label: 'Weight (lbs)',
+            data: weights,
+            borderColor: '#104E8B',
+            backgroundColor: '#104E8B',
+            lineTension: 0,
+        }, {
+            fill: false,
+            label: 'Smoothed',
+            data: weighted_avg,
+            borderColor: '#1E90FF',
+            backgroundColor: '#1E90FF',
+            lineTension: 0.4,
+            pointRadius: 0
+        }, {
+            fill: false,
+            label: 'Regression',
+            data: regs.map(function(val) { return val[1]; }),
+            borderColor: '#cc0000',
+            backgroundColor: '#cc0000',
+            lineTension: 0.4,
+            pointRadius: 0
+        }]
+    };
+    var options = {
+        type: 'line',
+        data: data,
+        options: {
+            fill: false,
+            responsive: true,
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Date",
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: false,
+                    },
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Weight (lbs)",
+                    }
+                }]
+            },
+            animation: {
+                easing: 'linear',
+                duration: 500
+            }
+        }
+    };
+    globalChart = new Chart(ctx, options);
+}
+</script>

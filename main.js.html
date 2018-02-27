@@ -1,0 +1,37 @@
+<!-- This is the client side javascript -->
+
+<script>
+// start by getting the data
+window.onload = function() {
+  google.script.run
+    .withSuccessHandler(initChart)
+    .getChartData();
+  $("#wa_input").val(function( i, val ) {
+    return wa_val;
+  });
+  
+  $("#order_input").val(function( i, val ) {
+    return po_val;
+  });
+};
+
+$("#order_input").bind('keyup change click', function (e) {
+    if (po_val != $(this).val())
+   {
+       console.log('po_val: ' + po_val.toString());
+       console.log('$(this).val(): ' + $(this).val().toString());
+       po_val = $(this).val();
+       updateChart();
+   }
+});
+
+$("#wa_input").bind('keyup change click', function (e) {
+    if (wa_val != $(this).val())
+   {
+        console.log('wa_val: ' + wa_val.toString());
+        console.log('$(this).val(): ' + $(this).val().toString());
+        wa_val = $(this).val();
+        updateChart();
+   }
+});
+</script>
